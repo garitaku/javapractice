@@ -3,6 +3,7 @@ package network;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -18,11 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class SimpleChatClient extends JFrame implements ActionListener {
-	public static void main(String[] args) {
-		SimpleChatClient scc = new SimpleChatClient();
-		scc.connect();
-	}
+class SimpleChatClientFrame extends JFrame implements ActionListener {
 
 	PrintWriter out;
 	BufferedReader in;
@@ -31,10 +28,11 @@ public class SimpleChatClient extends JFrame implements ActionListener {
 	Socket cs = null;
 	JButton sendButton = new JButton("送信");
 
-	SimpleChatClient() {
+	SimpleChatClientFrame() {
 		setTitle("チャットアプリ");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JScrollPane sp = new JScrollPane(textArea);
+		addWindowListener(new MyWindowAdapter());
 		getContentPane().add(sp);
 		getContentPane().add(BorderLayout.EAST, sendButton);
 		getContentPane().add(BorderLayout.SOUTH, tf);
@@ -83,6 +81,16 @@ public class SimpleChatClient extends JFrame implements ActionListener {
 		out.println(text);
 		tf.setText("");
 		out.flush();
+	}
+}
 
+class MyWindowAdapter extends WindowAdapter {
+
+}
+
+class SimpleChatClient {
+	public static void main(String[] args) {
+		SimpleChatClientFrame scc = new SimpleChatClientFrame();
+		scc.connect();
 	}
 }

@@ -45,7 +45,7 @@ class ChatThread extends Thread {
 	public ChatThread(Socket cs) {
 		this.cs = cs;
 	}
-
+	
 	public void run() {
 		BufferedReader in = null;
 		try {
