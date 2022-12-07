@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -25,7 +24,7 @@ class SimpleChatClientFrame extends JFrame implements ActionListener {
 	BufferedReader in;
 	JTextArea textArea = new JTextArea(5, 20);
 	JTextField tf = new JTextField(20);
-	Socket cs = null;
+	Socket cs;
 	JButton sendButton = new JButton("送信");
 
 	SimpleChatClientFrame() {
@@ -52,23 +51,22 @@ class SimpleChatClientFrame extends JFrame implements ActionListener {
 	}
 
 	public void connect() {
-//		Socket cs = new Socket("192.168.0.154", 5000);//富永さんのIPアドレス
+
 		try {
+//			cs = new Socket("192.168.0.154", 5000);//富永さんのIPアドレス
 			cs = new Socket("127.0.0.1", 5000);
 			System.out.println("接続しました");
-			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(cs.getOutputStream()));
-			out = new PrintWriter(bw);
+//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(cs.getOutputStream()));
+			out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(cs.getOutputStream())));
 			in = new BufferedReader(new InputStreamReader(cs.getInputStream()));
+
 			while (cs != null && cs.isConnected()) {
-
+				System.out.println("サーバーからメッセージを今から読み取る予定");
 				String message = in.readLine();
+				System.out.println("サーバーから" + message + "を受け取りました");
 				textArea.append(message + "\r\n");
-
 			}
 
-		} catch (UnknownHostException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
@@ -77,10 +75,15 @@ class SimpleChatClientFrame extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		String text = tf.getText();
-		out.println(text);
-		tf.setText("");
-		out.flush();
+		if (cs != null && cs.isConnected()) {
+			String text = tf.getText();
+			out.println(text);
+			tf.setText("");
+			out.flush();
+		} else {
+			System.err.println("接続されてへんで");
+		}
+
 	}
 }
 
