@@ -110,6 +110,7 @@ public class SimpleChatServer {
 				cs = ss.accept();
 				ChatThread chat = new ChatThread(cs);
 				chat.start();
+				System.out.println("新しいスレッドが建てられました");
 			}
 		} catch (Exception e) {
 			// TODO 自動生成された catch ブロック
@@ -136,15 +137,25 @@ class ChatThread extends Thread {
 		try {
 			System.err.println("接続しました");
 			BufferedReader in = new BufferedReader(new InputStreamReader(cs.getInputStream()));
-//			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(cs.getOutputStream())));
+			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(cs.getOutputStream())));
+//			out.println(in.readLine());
+//			out.flush();
 			while (true) {
 				try {
+					System.out.println("クライアントからの入力を待ち受けています");
 					String message = in.readLine();
+					if (message == null) {
+						cs.close();
+						threads.remove(this);
+						return;
+					}
 					System.out.println("クライアントから" + message + "を受け取りました");
 					talk(message);
 				} catch (Exception e) {
 					System.err.println("接続が切れました");
 					cs.close();
+					in.close();
+					out.close();
 					threads.remove(this);
 					return;
 				}
@@ -170,7 +181,7 @@ class ChatThread extends Thread {
 	public void talkone(String message) {
 		try {
 			PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(cs.getOutputStream())));
-			out.print(message + "\r\n");
+			out.println(message);
 			out.flush();
 			System.out.println(message + "を送りました");
 		} catch (Exception e) {
